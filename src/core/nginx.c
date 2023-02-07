@@ -228,8 +228,8 @@ main(int argc, char *const *argv)
     ngx_regex_init();
 #endif
 
-    ngx_pid = ngx_getpid();
-    ngx_parent = ngx_getppid();
+    ngx_pid = ngx_getpid();    // getpid
+    ngx_parent = ngx_getppid();  // getppid
 
     log = ngx_log_init(ngx_prefix, ngx_error_log);
     if (log == NULL) {
