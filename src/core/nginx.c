@@ -202,27 +202,27 @@ main(int argc, char *const *argv)
     ngx_conf_dump_t  *cd;
     ngx_core_conf_t  *ccf;
 
-    ngx_debug_init();
+    ngx_debug_init(); // 设置ngx_debug_malloc变量为1
 
-    if (ngx_strerror_init() != NGX_OK) {
+    if (ngx_strerror_init() != NGX_OK) {  //  使用strerror测试错误码对应的错误描述，没有描述的使用自定义错误描述，申请内存保存错误码和描述之间的映射
         return 1;
     }
 
-    if (ngx_get_options(argc, argv) != NGX_OK) {
+    if (ngx_get_options(argc, argv) != NGX_OK) {  // nginx命令指定的参数解析, 如 nginx -c /usr/local/nginx/conf/nginx.conf 指定配置文件
         return 1;
     }
 
-    if (ngx_show_version) {
+    if (ngx_show_version) { // nginx -v 、-V 会输出版本信息
         ngx_show_version_info();
 
-        if (!ngx_test_config) {
+        if (!ngx_test_config) {  // 不带-t直接结束程序
             return 0;
         }
     }
 
     /* TODO */ ngx_max_sockets = -1;
 
-    ngx_time_init();
+    ngx_time_init();   // 时间初始化 TODO
 
 #if (NGX_PCRE)
     ngx_regex_init();
@@ -804,7 +804,7 @@ ngx_get_options(int argc, char *const *argv)
                     goto next;
                 }
 
-                ngx_log_stderr(0, "option \"-p\" requires directory name");
+                ngx_log_stderr(0, "option \"-p\" requires directory name");  // 指定路径 -p
                 return NGX_ERROR;
 
             case 'e':
@@ -815,7 +815,7 @@ ngx_get_options(int argc, char *const *argv)
                     ngx_error_log = (u_char *) argv[i];
 
                 } else {
-                    ngx_log_stderr(0, "option \"-e\" requires file name");
+                    ngx_log_stderr(0, "option \"-e\" requires file name");  // -e 指定错误日志输出路径
                     return NGX_ERROR;
                 }
 
@@ -836,7 +836,7 @@ ngx_get_options(int argc, char *const *argv)
                     goto next;
                 }
 
-                ngx_log_stderr(0, "option \"-c\" requires file name");
+                ngx_log_stderr(0, "option \"-c\" requires file name");  // 指定配置文件
                 return NGX_ERROR;
 
             case 'g':
@@ -850,7 +850,7 @@ ngx_get_options(int argc, char *const *argv)
                     goto next;
                 }
 
-                ngx_log_stderr(0, "option \"-g\" requires parameter");
+                ngx_log_stderr(0, "option \"-g\" requires parameter");  // 指定配置文件外的全局指令
                 return NGX_ERROR;
 
             case 's':
@@ -861,7 +861,7 @@ ngx_get_options(int argc, char *const *argv)
                     ngx_signal = argv[i];
 
                 } else {
-                    ngx_log_stderr(0, "option \"-s\" requires parameter");
+                    ngx_log_stderr(0, "option \"-s\" requires parameter");  // -s stop/quit/reopen/reload 
                     return NGX_ERROR;
                 }
 
