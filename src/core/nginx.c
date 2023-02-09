@@ -231,7 +231,7 @@ main(int argc, char *const *argv)
     ngx_pid = ngx_getpid();    // getpid
     ngx_parent = ngx_getppid();  // getppid
 
-    log = ngx_log_init(ngx_prefix, ngx_error_log);
+    log = ngx_log_init(ngx_prefix, ngx_error_log); // 日志初始化，DEBUG看一下值
     if (log == NULL) {
         return 1;
     }
@@ -246,20 +246,20 @@ main(int argc, char *const *argv)
      * ngx_process_options()
      */
 
-    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));
+    ngx_memzero(&init_cycle, sizeof(ngx_cycle_t)); // ngx_cycle_t 结构
     init_cycle.log = log;
     ngx_cycle = &init_cycle;
 
-    init_cycle.pool = ngx_create_pool(1024, log);
+    init_cycle.pool = ngx_create_pool(1024, log);  // 初始化1024内存
     if (init_cycle.pool == NULL) {
         return 1;
     }
 
-    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
+    if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) { // 初始化ngx_argv保存参数
         return 1;
     }
 
-    if (ngx_process_options(&init_cycle) != NGX_OK) {
+    if (ngx_process_options(&init_cycle) != NGX_OK) { // 初始化conf_prefix和prefix
         return 1;
     }
 
@@ -271,7 +271,7 @@ main(int argc, char *const *argv)
      * ngx_crc32_table_init() requires ngx_cacheline_size set in ngx_os_init()
      */
 
-    if (ngx_crc32_table_init() != NGX_OK) {
+    if (ngx_crc32_table_init() != NGX_OK) {  
         return 1;
     }
 
@@ -325,7 +325,7 @@ main(int argc, char *const *argv)
         return 0;
     }
 
-    if (ngx_signal) {
+    if (ngx_signal) {  //  nginx -s stop/reload等信号
         return ngx_signal_process(cycle, ngx_signal);
     }
 
