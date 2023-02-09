@@ -107,7 +107,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     size = sizeof(master_process);
 
     for (i = 0; i < ngx_argc; i++) {
-        size += ngx_strlen(ngx_argv[i]) + 1;
+        size += ngx_strlen(ngx_argv[i]) + 1;  // ngx_argv[0]: /usr/bin/nginx
     }
 
     title = ngx_pnalloc(cycle->pool, size);
@@ -116,7 +116,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
         exit(2);
     }
 
-    p = ngx_cpymem(title, master_process, sizeof(master_process) - 1);
+    p = ngx_cpymem(title, master_process, sizeof(master_process) - 1);  // title: "master process"
     for (i = 0; i < ngx_argc; i++) {
         *p++ = ' ';
         p = ngx_cpystrn(p, (u_char *) ngx_argv[i], size);
@@ -127,9 +127,12 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
-    ngx_start_worker_processes(cycle, ccf->worker_processes,
+    ngx_start_worker_processes(cycle, ccf->worker_processes,   // 这里fork子进程，即work进程
                                NGX_PROCESS_RESPAWN);
-    ngx_start_cache_manager_processes(cycle, 0);
+    // ngx_processes[i] = {pid = 829613, status = 0, channel = {3, 7}, proc = 0x55555559efc3 <ngx_worker_process_cycle>, data = 0x0, name = 0x555555607375 "worker process",
+    // respawn = 1, just_spawn = 0, detached = 0, exiting = 0, exited = 0}
+
+    ngx_start_cache_manager_processes(cycle, 0);  // TODO
 
     ngx_new_binary = 0;
     delay = 0;
@@ -333,7 +336,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
 
 
 static void
-ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
+ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)  
 {
     ngx_int_t  i;
 
@@ -400,7 +403,7 @@ ngx_pass_open_channel(ngx_cycle_t *cycle)
 
     ch.command = NGX_CMD_OPEN_CHANNEL;
     ch.pid = ngx_processes[ngx_process_slot].pid;
-    ch.slot = ngx_process_slot;
+    ch.slot = ngx_process_slot;  // 刚刚创建的子进程索引
     ch.fd = ngx_processes[ngx_process_slot].channel[0];
 
     for (i = 0; i < ngx_last_process; i++) {

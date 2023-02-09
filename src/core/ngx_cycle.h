@@ -37,7 +37,7 @@ struct ngx_shm_zone_s {
 
 
 struct ngx_cycle_s {
-    void                  ****conf_ctx;
+    void                  ****conf_ctx;  // ngx_max_module = 182  每个module下有个index，通过index索引conf_ctx下的元素
     ngx_pool_t               *pool;
 
     ngx_log_t                *log;
@@ -49,15 +49,15 @@ struct ngx_cycle_s {
     ngx_connection_t         *free_connections;
     ngx_uint_t                free_connection_n;
 
-    ngx_module_t            **modules;
-    ngx_uint_t                modules_n;
+    ngx_module_t            **modules;   // ngx_core_module  ngx_errlog_module  ngx_conf_module ngx_openssl_module ngx_regex_module ngx_events_module ngx_event_core_module ...
+    ngx_uint_t                modules_n;   // 模块数 54
     ngx_uint_t                modules_used;    /* unsigned  modules_used:1; */
 
     ngx_queue_t               reusable_connections_queue;
     ngx_uint_t                reusable_connections_n;
     time_t                    connections_reuse_time;
 
-    ngx_array_t               listening;
+    ngx_array_t               listening;  // ngx_listening_t
     ngx_array_t               paths;
 
     ngx_array_t               config_dump;
@@ -65,7 +65,7 @@ struct ngx_cycle_s {
     ngx_rbtree_node_t         config_dump_sentinel;
 
     ngx_list_t                open_files;
-    ngx_list_t                shared_memory;
+    ngx_list_t                shared_memory;  // ngx_shm_zone_t
 
     ngx_uint_t                connection_n;
     ngx_uint_t                files_n;
@@ -76,13 +76,13 @@ struct ngx_cycle_s {
 
     ngx_cycle_t              *old_cycle;
 
-    ngx_str_t                 conf_file;
+    ngx_str_t                 conf_file;  // 配置文件  /usr/local/nginx/conf/nginx.conf
     ngx_str_t                 conf_param;
-    ngx_str_t                 conf_prefix;
-    ngx_str_t                 prefix;
-    ngx_str_t                 error_log;
+    ngx_str_t                 conf_prefix;  // /usr/local/nginx/conf/
+    ngx_str_t                 prefix;  // /usr/local/nginx/
+    ngx_str_t                 error_log;  // logs/error.log
     ngx_str_t                 lock_file;
-    ngx_str_t                 hostname;
+    ngx_str_t                 hostname;  //  主机名 "vm-0-4-ubuntu"
 };
 
 
@@ -93,7 +93,7 @@ typedef struct {
     ngx_msec_t                timer_resolution;
     ngx_msec_t                shutdown_timeout;
 
-    ngx_int_t                 worker_processes;
+    ngx_int_t                 worker_processes;  // 子进程work进程个数，配置文件中获得？ 解析路径梳理下
     ngx_int_t                 debug_points;
 
     ngx_int_t                 rlimit_nofile;

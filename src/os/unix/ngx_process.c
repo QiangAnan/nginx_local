@@ -33,7 +33,7 @@ char           **ngx_os_argv;
 ngx_int_t        ngx_process_slot;
 ngx_socket_t     ngx_channel;
 ngx_int_t        ngx_last_process;
-ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];
+ngx_process_t    ngx_processes[NGX_MAX_PROCESSES]; // 1024  保存work进程
 
 
 ngx_signal_t  signals[] = {
@@ -95,8 +95,8 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
         s = respawn;
 
     } else {
-        for (s = 0; s < ngx_last_process; s++) {
-            if (ngx_processes[s].pid == -1) {
+        for (s = 0; s < ngx_last_process; s++) {  // ngx_last_process = 0
+            if (ngx_processes[s].pid == -1) {  // 下标s是用来索引每个work进程的，ngx_last_process每创建一个进程就+1
                 break;
             }
         }
@@ -110,7 +110,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
     }
 
 
-    if (respawn != NGX_PROCESS_DETACHED) {
+    if (respawn != NGX_PROCESS_DETACHED) { //  respawn = -3  NGX_PROCESS_RESPAWN
 
         /* Solaris 9 still has no AF_LOCAL */
 
@@ -185,7 +185,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 
     pid = fork();
 
-    switch (pid) {
+    switch (pid) {  // 注意，debug到这里是设置父进程模式，set follow-fork-mode parent
 
     case -1:
         ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
@@ -193,7 +193,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
         ngx_close_channel(ngx_processes[s].channel, cycle->log);
         return NGX_INVALID_PID;
 
-    case 0:
+    case 0:  
         ngx_parent = ngx_pid;
         ngx_pid = ngx_getpid();
         proc(cycle, data);
@@ -261,7 +261,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 ngx_pid_t
 ngx_execute(ngx_cycle_t *cycle, ngx_exec_ctx_t *ctx)
 {
-    return ngx_spawn_process(cycle, ngx_execute_proc, ctx, ctx->name,
+    return ngx_spawn_process(cycle, ngx_execute_proc, ctx, ctx->name,  // ngx_execute_proc: ngx_worker_process_cycle
                              NGX_PROCESS_DETACHED);
 }
 

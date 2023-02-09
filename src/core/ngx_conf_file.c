@@ -155,7 +155,7 @@ ngx_conf_add_dump(ngx_conf_t *cf, ngx_str_t *filename)
 
 
 char *
-ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
+ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)  // /usr/local/nginx/conf/nginx.conf
 {
     char             *rv;
     ngx_fd_t          fd;

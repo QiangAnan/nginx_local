@@ -361,19 +361,19 @@ ngx_log_init(u_char *prefix, u_char *error_log)
                 return NULL;
             }
 
-            p = ngx_cpymem(name, prefix, plen);
+            p = ngx_cpymem(name, prefix, plen);  // prefix: /usr/local/nginx
 
             if (!ngx_path_separator(*(p - 1))) {
                 *p++ = '/';
             }
 
-            ngx_cpystrn(p, error_log, nlen + 1);
+            ngx_cpystrn(p, error_log, nlen + 1);  // name: /usr/local/nginx/logs/error.log
 
             p = name;
         }
     }
 
-    ngx_log_file.fd = ngx_open_file(name, NGX_FILE_APPEND,
+    ngx_log_file.fd = ngx_open_file(name, NGX_FILE_APPEND,    // 打开 /usr/local/nginx/logs/error.log
                                     NGX_FILE_CREATE_OR_OPEN,
                                     NGX_FILE_DEFAULT_ACCESS);
 

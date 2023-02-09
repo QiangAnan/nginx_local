@@ -66,13 +66,13 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     log = old_cycle->log;
 
-    pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);
+    pool = ngx_create_pool(NGX_CYCLE_POOL_SIZE, log);  // 16 * 1024 
     if (pool == NULL) {
         return NULL;
     }
     pool->log = log;
 
-    cycle = ngx_pcalloc(pool, sizeof(ngx_cycle_t));
+    cycle = ngx_pcalloc(pool, sizeof(ngx_cycle_t));  // sizeof(ngx_cycle_t) 648
     if (cycle == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
@@ -90,19 +90,19 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
     cycle->prefix.len = old_cycle->prefix.len;
-    cycle->prefix.data = ngx_pstrdup(pool, &old_cycle->prefix);
+    cycle->prefix.data = ngx_pstrdup(pool, &old_cycle->prefix);  // /usr/local/nginx/conf/
     if (cycle->prefix.data == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
 
     cycle->error_log.len = old_cycle->error_log.len;
-    cycle->error_log.data = ngx_pnalloc(pool, old_cycle->error_log.len + 1);
+    cycle->error_log.data = ngx_pnalloc(pool, old_cycle->error_log.len + 1);  // /usr/local/nginx/
     if (cycle->error_log.data == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
     }
-    ngx_cpystrn(cycle->error_log.data, old_cycle->error_log.data,
+    ngx_cpystrn(cycle->error_log.data, old_cycle->error_log.data,  // logs/error.log
                 old_cycle->error_log.len + 1);
 
     cycle->conf_file.len = old_cycle->conf_file.len;
@@ -111,11 +111,11 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         ngx_destroy_pool(pool);
         return NULL;
     }
-    ngx_cpystrn(cycle->conf_file.data, old_cycle->conf_file.data,
+    ngx_cpystrn(cycle->conf_file.data, old_cycle->conf_file.data,   // /usr/local/nginx/conf/nginx.conf
                 old_cycle->conf_file.len + 1);
 
     cycle->conf_param.len = old_cycle->conf_param.len;
-    cycle->conf_param.data = ngx_pstrdup(pool, &old_cycle->conf_param);
+    cycle->conf_param.data = ngx_pstrdup(pool, &old_cycle->conf_param);  // ""
     if (cycle->conf_param.data == NULL) {
         ngx_destroy_pool(pool);
         return NULL;
@@ -134,7 +134,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     ngx_memzero(cycle->paths.elts, n * sizeof(ngx_path_t *));
 
 
-    if (ngx_array_init(&cycle->config_dump, pool, 1, sizeof(ngx_conf_dump_t))
+    if (ngx_array_init(&cycle->config_dump, pool, 1, sizeof(ngx_conf_dump_t))  // sizeof(ngx_conf_dump_t) 24
         != NGX_OK)
     {
         ngx_destroy_pool(pool);
@@ -229,13 +229,13 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
 
     for (i = 0; cycle->modules[i]; i++) {
-        if (cycle->modules[i]->type != NGX_CORE_MODULE) {
+        if (cycle->modules[i]->type != NGX_CORE_MODULE) {  //  core
             continue;
         }
 
         module = cycle->modules[i]->ctx;
 
-        if (module->create_conf) {
+        if (module->create_conf) {    // ngx_core_module_create_conf
             rv = module->create_conf(cycle);
             if (rv == NULL) {
                 ngx_destroy_pool(pool);
@@ -246,7 +246,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
 
-    senv = environ;
+    senv = environ;  // SHELL=/bin/bash
 
 
     ngx_memzero(&conf, sizeof(ngx_conf_t));
@@ -281,7 +281,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         return NULL;
     }
 
-    if (ngx_conf_parse(&conf, &cycle->conf_file) != NGX_CONF_OK) {
+    if (ngx_conf_parse(&conf, &cycle->conf_file) != NGX_CONF_OK) {  // /usr/local/nginx/conf/nginx.conf
         environ = senv;
         ngx_destroy_cycle_pools(&conf);
         return NULL;
@@ -299,7 +299,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
         module = cycle->modules[i]->ctx;
 
-        if (module->init_conf) {
+        if (module->init_conf) {  // ngx_core_module_init_conf
             if (module->init_conf(cycle,
                                   cycle->conf_ctx[cycle->modules[i]->index])
                 == NGX_CONF_ERROR)
@@ -311,13 +311,13 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         }
     }
 
-    if (ngx_process == NGX_PROCESS_SIGNALLER) {
+    if (ngx_process == NGX_PROCESS_SIGNALLER) {  // ngx_process = 0
         return cycle;
     }
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
-    if (ngx_test_config) {
+    if (ngx_test_config) { 
 
         if (ngx_create_pidfile(&ccf->pid, log) != NGX_OK) {
             goto failed;
@@ -375,8 +375,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
             file = part->elts;
             i = 0;
         }
-
-        if (file[i].name.len == 0) {
+        // file[0] = {fd = 4, name = {len = 32, data = 0x55555569aa50 "/usr/local/nginx/logs/access.log"}, flush = 0x0, data = 0x0}
+        // file[1]= {len = 31, data = 0x55555569f1f0 "/usr/local/nginx/logs/error.log"}, flush = 0x0, data = 0x0}
+        if (file[i].name.len == 0) {  
             continue;
         }
 

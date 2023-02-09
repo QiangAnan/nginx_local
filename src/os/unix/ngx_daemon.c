@@ -14,7 +14,7 @@ ngx_daemon(ngx_log_t *log)
 {
     int  fd;
 
-    switch (fork()) {
+    switch (fork()) {  // 父进程返回子进程pid，子进程返回0
     case -1:
         ngx_log_error(NGX_LOG_EMERG, log, ngx_errno, "fork() failed");
         return NGX_ERROR;
