@@ -346,7 +346,7 @@ main(int argc, char *const *argv)
     }
 
     if (!ngx_inherited && ccf->daemon) {
-        if (ngx_daemon(cycle->log) != NGX_OK) {  // 创建子进程，父进程在这里退出？  set follow-fork-mode
+        if (ngx_daemon(cycle->log) != NGX_OK) {  // 创建子进程，父进程在这里退出？  set follow-fork-mode child
             return 1;
         }
 
