@@ -324,7 +324,7 @@ ngx_log_init(u_char *prefix, u_char *error_log)
     ngx_log.log_level = NGX_LOG_NOTICE;
 
     if (error_log == NULL) {
-        error_log = (u_char *) NGX_ERROR_LOG_PATH;
+        error_log = (u_char *) NGX_ERROR_LOG_PATH; // logs/error.log
     }
 
     name = error_log;
@@ -340,7 +340,7 @@ ngx_log_init(u_char *prefix, u_char *error_log)
 #if (NGX_WIN32)
     if (name[1] != ':') {
 #else
-    if (name[0] != '/') {
+    if (name[0] != '/') {  // 如果不是绝对路径，则需要prefix构成绝对路径
 #endif
 
         if (prefix) {
@@ -348,14 +348,14 @@ ngx_log_init(u_char *prefix, u_char *error_log)
 
         } else {
 #ifdef NGX_PREFIX
-            prefix = (u_char *) NGX_PREFIX;
+            prefix = (u_char *) NGX_PREFIX;  // /usr/local/nginx/
             plen = ngx_strlen(prefix);
 #else
             plen = 0;
 #endif
         }
 
-        if (plen) {
+        if (plen) {  // prefix+error_log_name构成错误日志的绝对路径
             name = malloc(plen + nlen + 2);
             if (name == NULL) {
                 return NULL;

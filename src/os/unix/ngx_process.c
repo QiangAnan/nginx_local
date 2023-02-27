@@ -185,7 +185,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 
     pid = fork();
 
-    switch (pid) {  // 注意，debug到这里是设置父进程模式，set follow-fork-mode parent
+    switch (pid) {  // 注意，debug到这里是设置父进程模式，set follow-fork-mode parent ； 父返回子pid，子返回0
 
     case -1:
         ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
@@ -196,7 +196,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
     case 0:  
         ngx_parent = ngx_pid;
         ngx_pid = ngx_getpid();
-        proc(cycle, data);
+        proc(cycle, data);  // ngx_worker_process_cycle
         break;
 
     default:

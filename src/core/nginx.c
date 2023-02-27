@@ -231,7 +231,7 @@ main(int argc, char *const *argv)
     ngx_pid = ngx_getpid();    // getpid
     ngx_parent = ngx_getppid();  // getppid
 
-    log = ngx_log_init(ngx_prefix, ngx_error_log); // 日志初始化，DEBUG看一下值
+    log = ngx_log_init(ngx_prefix, ngx_error_log); // 日志初始化，DEBUG看一下值 /usr/local/nginx/logs/error.log
     if (log == NULL) {
         return 1;
     }
@@ -259,7 +259,9 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    if (ngx_process_options(&init_cycle) != NGX_OK) { // 初始化conf_prefix和prefix
+    // 初始化conf_prefix：/usr/local/nginx/conf/nginx.conf和
+    // prefix: /usr/local/nginx/
+    if (ngx_process_options(&init_cycle) != NGX_OK) { 
         return 1;
     }
 
@@ -346,7 +348,7 @@ main(int argc, char *const *argv)
     }
 
     if (!ngx_inherited && ccf->daemon) {
-        if (ngx_daemon(cycle->log) != NGX_OK) {  // 创建子进程，父进程在这里退出？  set follow-fork-mode child
+        if (ngx_danemon(cycle->log) != NGX_OK) {  // 创建子进程，父进程在这里退出？  set follow-fork-mode child
             return 1;
         }
 
@@ -908,7 +910,7 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
     ngx_os_argv = (char **) argv;
     ngx_argc = argc;
 
-    ngx_argv = ngx_alloc((argc + 1) * sizeof(char *), cycle->log);
+    ngx_argv = ngx_alloc((argc + 1) * sizeof(char *), cycle->log);  // ngx_argv数组保存参数
     if (ngx_argv == NULL) {
         return NGX_ERROR;
     }
